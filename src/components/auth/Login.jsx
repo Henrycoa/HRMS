@@ -5,10 +5,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { 
     FaLock, FaEye, FaEyeSlash, FaBuilding, 
     FaArrowRight, FaUsers, FaChartLine, FaCalendarCheck,
-    FaShieldAlt, FaEnvelope, FaSun, FaMoon
+    FaShieldAlt, FaEnvelope
 } from 'react-icons/fa';
-import { useTheme } from '../../contexts/ThemeContext'; // 👈 IMPORT THEME
-import API from '../../config';
 import './Login.css';
 
 const Login = () => {
@@ -20,96 +18,90 @@ const Login = () => {
     const { login } = useAuth();
     const navigate = useNavigate();
 
-    // 👈 GET THEME
-    const { isDark, toggleTheme } = useTheme();
-
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
         setError('');
 
-        const result = await login(username, password);
+        try {
+            const result = await login(username, password);
 
-        if (result.success) {
-            navigate('/dashboard');
-        } else {
-            setError(result.message);
+            if (result.success) {
+                navigate('/dashboard');
+            } else if (result.requires_2fa) {
+                navigate('/2fa', { state: { userId: result.user_id } });
+            } else {
+                setError(result.message || 'Login failed');
+            }
+        } catch (err) {
+            console.error('Login error:', err);
+            setError('An error occurred. Please try again.');
+        } finally {
+            setLoading(false);
         }
-
-        setLoading(false);
     };
 
     return (
-        <div className={`login-container ${isDark ? 'dark' : ''}`}>
-            
-            {/* Theme Toggle Button */}
-            {/* <button
-                onClick={toggleTheme}
-                className={`theme-toggle ${isDark ? 'dark' : ''}`}
-                title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-            >
-                {isDark ? <FaSun /> : <FaMoon />}
-            </button> */}
-
+        <div className="login-container">
             {/* ===== LEFT SIDE ===== */}
-            <div className={`login-left ${isDark ? 'dark' : ''}`}>
+            <div className="login-left">
                 {/* Logo */}
                 <div className="logo">
-                    <div className={`logo-icon ${isDark ? 'dark' : ''}`}>
+                    <div className="logo-icon">
                         <FaBuilding />
                     </div>
                     <div>
-                        <span className={`logo-text ${isDark ? 'dark' : ''}`}>HRMS</span>
-                        <span className={`logo-sub ${isDark ? 'dark' : ''}`}>Enterprise Suite</span>
+                        <span className="logo-text">HRMS</span>
+                        <span className="logo-sub">Enterprise Suite</span>
                     </div>
                 </div>
 
                 {/* Hero */}
-                <div className={`hero ${isDark ? 'dark' : ''}`}>
+                <div className="hero">
                     <h1>
                         Streamline Your{' '}
-                        <span className={`highlight ${isDark ? 'dark' : ''}`}>HR Operations</span>
+                        <span className="highlight">HR Operations</span>
                     </h1>
 
                     <p>Manage employees, attendance, payroll, and performance in one secure platform.</p>
 
                     {/* Features */}
-                    <div className={`features ${isDark ? 'dark' : ''}`}>
-                        <div className={`feature-item ${isDark ? 'dark' : ''}`}>
-                            <div className={`feature-icon ${isDark ? 'dark' : ''}`}><FaUsers /></div>
+                    <div className="features">
+                        <div className="feature-item">
+                            <div className="feature-icon"><FaUsers /></div>
                             <div>
-                                <span className={`feature-label ${isDark ? 'dark' : ''}`}>Employee</span>
-                                <span className={`feature-sub ${isDark ? 'dark' : ''}`}>Management</span>
+                                <span className="feature-label">Employee</span>
+                                <span className="feature-sub">Management</span>
                             </div>
                         </div>
-                        <div className={`feature-item ${isDark ? 'dark' : ''}`}>
-                            <div className={`feature-icon ${isDark ? 'dark' : ''}`}><FaChartLine /></div>
+                        <div className="feature-item">
+                            <div className="feature-icon"><FaChartLine /></div>
                             <div>
-                                <span className={`feature-label ${isDark ? 'dark' : ''}`}>Real-time</span>
-                                <span className={`feature-sub ${isDark ? 'dark' : ''}`}>Analytics</span>
+                                <span className="feature-label">Real-time</span>
+                                <span className="feature-sub">Analytics</span>
                             </div>
                         </div>
-                        <div className={`feature-item ${isDark ? 'dark' : ''}`}>
-                            <div className={`feature-icon ${isDark ? 'dark' : ''}`}><FaCalendarCheck /></div>
+                        <div className="feature-item">
+                            <div className="feature-icon"><FaCalendarCheck /></div>
                             <div>
-                                <span className={`feature-label ${isDark ? 'dark' : ''}`}>Attendance</span>
-                                <span className={`feature-sub ${isDark ? 'dark' : ''}`}>Tracking</span>
+                                <span className="feature-label">Attendance</span>
+                                <span className="feature-sub">Tracking</span>
                             </div>
                         </div>
-                        <div className={`feature-item ${isDark ? 'dark' : ''}`}>
-                            <div className={`feature-icon ${isDark ? 'dark' : ''}`}><FaShieldAlt /></div>
+                        <div className="feature-item">
+                            <div className="feature-icon"><FaShieldAlt /></div>
                             <div>
-                                <span className={`feature-label ${isDark ? 'dark' : ''}`}>Secure</span>
-                                <span className={`feature-sub ${isDark ? 'dark' : ''}`}>Access</span>
+                                <span className="feature-label">Secure</span>
+                                <span className="feature-sub">Access</span>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 {/* Footer */}
-                <div className={`footer ${isDark ? 'dark' : ''}`}>
+                <div className="footer">
                     <span>© 2026 HRMS</span>
-                    <div className={`footer-links ${isDark ? 'dark' : ''}`}>
+                    <div className="footer-links">
                         <Link to="/privacy">Privacy</Link>
                         <Link to="/terms">Terms</Link>
                         <Link to="/support">Support</Link>
@@ -118,37 +110,37 @@ const Login = () => {
             </div>
 
             {/* ===== RIGHT SIDE ===== */}
-            <div className={`login-right ${isDark ? 'dark' : ''}`}>
-                <div className={`login-card ${isDark ? 'dark' : ''}`}>
+            <div className="login-right">
+                <div className="login-card">
                     {/* Mobile Logo */}
-                    <div className={`login-mobile-logo ${isDark ? 'dark' : ''}`}>
-                        <div className={`icon ${isDark ? 'dark' : ''}`}>
+                    <div className="login-mobile-logo">
+                        <div className="icon">
                             <FaBuilding />
                         </div>
                         <div>
-                            <span className={`title ${isDark ? 'dark' : ''}`}>HRMS</span>
-                            <span className={`sub ${isDark ? 'dark' : ''}`}>Enterprise Suite</span>
+                            <span className="title">HRMS</span>
+                            <span className="sub">Enterprise Suite</span>
                         </div>
                     </div>
 
                     {/* Header */}
-                    <div className={`login-card-header ${isDark ? 'dark' : ''}`}>
-                        <p className={`login-subtitle ${isDark ? 'dark' : ''}`}>Sign in to your account</p>
+                    <div className="login-card-header">
+                        <p className="login-subtitle">Sign in to your account</p>
                     </div>
 
                     {/* Error */}
                     {error && (
-                        <div className={`error-box ${isDark ? 'dark' : ''}`}>
+                        <div className="error-box">
                             {error}
                         </div>
                     )}
 
                     {/* Form */}
-                    <form onSubmit={handleSubmit} className={`login-form ${isDark ? 'dark' : ''}`}>
-                        <div className={`form-group ${isDark ? 'dark' : ''}`}>
-                            <label className={isDark ? 'dark' : ''}>Username or Email</label>
-                            <div className={`input-wrapper ${isDark ? 'dark' : ''}`}>
-                                <FaEnvelope className={`input-icon ${isDark ? 'dark' : ''}`} />
+                    <form onSubmit={handleSubmit} className="login-form">
+                        <div className="form-group">
+                            <label>Username or Email</label>
+                            <div className="input-wrapper">
+                                <FaEnvelope className="input-icon" />
                                 <input
                                     type="text"
                                     value={username}
@@ -156,20 +148,19 @@ const Login = () => {
                                     placeholder="Enter username or email"
                                     required
                                     disabled={loading}
-                                    className={isDark ? 'dark' : ''}
                                 />
                             </div>
                         </div>
 
-                        <div className={`form-group ${isDark ? 'dark' : ''}`}>
-                            <div className={`flex-row ${isDark ? 'dark' : ''}`}>
-                                <label className={isDark ? 'dark' : ''}>Password</label>
-                                <Link to="/forgot-password" className={`forgot-link ${isDark ? 'dark' : ''}`}>
+                        <div className="form-group">
+                            <div className="flex-row">
+                                <label>Password</label>
+                                <Link to="/forgot-password" className="forgot-link">
                                     Forgot?
                                 </Link>
                             </div>
-                            <div className={`password-wrapper ${isDark ? 'dark' : ''}`}>
-                                <FaLock className={`input-icon ${isDark ? 'dark' : ''}`} />
+                            <div className="password-wrapper">
+                                <FaLock className="input-icon" />
                                 <input
                                     type={showPassword ? 'text' : 'password'}
                                     value={password}
@@ -177,19 +168,18 @@ const Login = () => {
                                     placeholder="Enter your password"
                                     required
                                     disabled={loading}
-                                    className={isDark ? 'dark' : ''}
                                 />
                                 <button
                                     type="button"
                                     onClick={() => setShowPassword(!showPassword)}
-                                    className={`password-toggle ${isDark ? 'dark' : ''}`}
+                                    className="password-toggle"
                                 >
                                     {showPassword ? <FaEyeSlash /> : <FaEye />}
                                 </button>
                             </div>
                         </div>
 
-                        <button type="submit" disabled={loading} className={`btn-submit ${isDark ? 'dark' : ''}`}>
+                        <button type="submit" disabled={loading} className="btn-submit">
                             {loading ? (
                                 <span className="flex items-center gap-2">
                                     <span className="spinner"></span>
@@ -204,19 +194,19 @@ const Login = () => {
                     </form>
 
                     {/* Register */}
-                    <div className={`register-link ${isDark ? 'dark' : ''}`}>
+                    <div className="register-link">
                         Don't have an account?{' '}
-                        <Link to="/register" className={isDark ? 'dark' : ''}>Create one now</Link>
+                        <Link to="/register">Create one now</Link>
                     </div>
 
                     {/* Demo */}
-                    <div className={`demo-box ${isDark ? 'dark' : ''}`}>
-                        <div className={`demo-row ${isDark ? 'dark' : ''}`}>
-                            <span className={`demo-label ${isDark ? 'dark' : ''}`}>🔑 Demo Access</span>
-                            <div className={`demo-codes ${isDark ? 'dark' : ''}`}>
-                                <code className={`demo-code ${isDark ? 'dark' : ''}`}>hr</code>
-                                <span className={`demo-sep ${isDark ? 'dark' : ''}`}>/</span>
-                                <code className={`demo-code ${isDark ? 'dark' : ''}`}>password123</code>
+                    <div className="demo-box">
+                        <div className="demo-row">
+                            <span className="demo-label">🔑 Demo Access</span>
+                            <div className="demo-codes">
+                                <code className="demo-code">admin</code>
+                                <span className="demo-sep">/</span>
+                                <code className="demo-code">password</code>
                             </div>
                         </div>
                     </div>
