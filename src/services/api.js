@@ -1,31 +1,123 @@
 // frontend/src/services/api.js
 import axios from "axios";
+import { API_BASE_URL } from "../config";
 
-const API_URL = "/backend";
-
+// =========================================================
+//  CREATE AXIOS INSTANCE
+// =========================================================
 const api = axios.create({
-  baseURL: API_URL,
+  baseURL: API_BASE_URL,
   headers: {
     "Content-Type": "application/json",
     Accept: "application/json",
   },
   withCredentials: true,
+  timeout: 30000,
 });
 
-// Response interceptor
-api.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      window.location.href = "/login";
+// =========================================================
+//  REQUEST INTERCEPTOR
+// =========================================================
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
     }
-    return Promise.reject(error);
+    
+    // Log request in development only
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`🚀 [API] ${config.method.toUpperCase()} ${config.url}`, config.data || '');
+    }
+    
+    return config;
   },
+  (error) => {
+    console.error('❌ [API] Request Error:', error);
+    return Promise.reject(error);
+  }
 );
 
-// ============================================
-// AUTH API
-// ============================================
+// =========================================================
+//  RESPONSE INTERCEPTOR
+// =========================================================
+api.interceptors.response.use(
+  (response) => {
+    // Log response in development only
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`✅ [API] ${response.status} ${response.config.url}`, response.data);
+    }
+    return response;
+  },
+  (error) => {
+    // Handle 401 Unauthorized
+    if (error.response?.status === 401) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      localStorage.removeItem("employee_id");
+      
+      if (window.location.pathname !== "/login" && 
+          window.location.pathname !== "/register" &&
+          window.location.pathname !== "/forgot-password" &&
+          window.location.pathname !== "/reset-password") {
+        window.location.href = "/login";
+      }
+    }
+    
+    // Handle 403 Forbidden
+    if (error.response?.status === 403) {
+      console.warn('⚠️ [API] Forbidden - Insufficient permissions');
+    }
+    
+    // Handle 500 Server Error
+    if (error.response?.status >= 500) {
+      console.error('❌ [API] Server Error:', error.response.data);
+    }
+    
+    // Handle Network Error
+    if (error.code === 'ERR_NETWORK') {
+      console.error('❌ [API] Network Error - Please check your connection');
+    }
+    
+    return Promise.reject(error);
+  }
+);
+
+// =========================================================
+//  EXPORT API INSTANCE
+// =========================================================
+export default api;
+
+// =========================================================
+//  API HELPERS
+// =========================================================
+
+// GET with params
+api.getWithParams = (url, params = {}) => {
+  return api.get(url, { params });
+};
+
+// POST with FormData
+api.postFormData = (url, formData) => {
+  return api.post(url, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+};
+
+// PUT with FormData
+api.putFormData = (url, formData) => {
+  return api.put(url, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+};
+
+// =========================================================
+//  AUTH API
+// =========================================================
 export const authAPI = {
   login: (username, password) =>
     api.post("/auth-file/login.php", { username, password }),
@@ -34,11 +126,10 @@ export const authAPI = {
   me: () => api.get("/auth-file/me.php"),
 };
 
-// ============================================
-// EMPLOYEE API - COMPLETE
-// ============================================
+// =========================================================
+//  EMPLOYEE API
+// =========================================================
 export const employeeAPI = {
-  // CRUD
   getAll: (params = {}) => {
     const query = new URLSearchParams(params).toString();
     return api.get(`/api/employees.php?${query}`);
@@ -47,28 +138,18 @@ export const employeeAPI = {
   create: (data) => api.post("/api/employees.php", data),
   update: (id, data) => api.put(`/api/employees.php?id=${id}`, data),
   delete: (id) => api.delete(`/api/employees.php?id=${id}`),
-
-  // ✅ PHOTO UPLOAD - Complete
   uploadPhoto: (employeeId, file) => {
     const formData = new FormData();
     formData.append("employee_id", employeeId);
     formData.append("photo", file);
     return api.post("/api/employee-photo.php", formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
+      headers: { "Content-Type": "multipart/form-data" },
     });
   },
-
-  // Get photo
   getPhoto: (employeeId) =>
     api.get(`/api/employee-photo.php?employee_id=${employeeId}`),
-
-  // Delete photo
   deletePhoto: (employeeId) =>
     api.delete(`/api/employee-photo.php?employee_id=${employeeId}`),
-
-  // Documents
   uploadDocument: (employeeId, file, documentName) => {
     const formData = new FormData();
     formData.append("employee_id", employeeId);
@@ -82,8 +163,6 @@ export const employeeAPI = {
     api.get(`/api/employee-documents.php?employee_id=${employeeId}`),
   deleteDocument: (documentId) =>
     api.delete(`/api/employee-documents.php?id=${documentId}`),
-
-  // Import / Export
   importEmployees: (file) => {
     const formData = new FormData();
     formData.append("file", file);
@@ -97,4 +176,7 @@ export const employeeAPI = {
     }),
 };
 
-export default api;
+// =========================================================
+//  EXPORT ALL
+// =========================================================
+export { api };
