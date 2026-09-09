@@ -1,14 +1,17 @@
 // frontend/tailwind.config.js
 /** @type {import('tailwindcss').Config} */
 export default {
-  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
-  darkMode: "class", // 👈 ENABLE DARK MODE
+  content: [
+    "./index.html",
+    "./src/**/*.{js,ts,jsx,tsx}",
+  ],
+  darkMode: 'class',
   theme: {
     extend: {
       colors: {
-        // You can add custom colors here
+        // Custom colors if needed
       },
     },
   },
   plugins: [],
-};
+}
