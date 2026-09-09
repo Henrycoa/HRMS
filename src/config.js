@@ -2,9 +2,11 @@
 // =========================================================
 //  🔧 CHANGE THIS ONE LINE TO SWITCH ENVIRONMENTS
 // =========================================================
+
+// For InfinityFree Production
 const API_BASE_URL = "/backend";
-// const API_BASE_URL = "https://schedulingandappointment.lgu2.com/backend";
-// const API_BASE_URL = "https://staging.lgu2.com/backend";
+// const API_BASE_URL = "http://localhost/Lord%20help/backend";
+// const API_BASE_URL = "https://hrms1231.infy.click/backend";
 
 // =========================================================
 //  📡 ALL API ENDPOINTS
@@ -123,20 +125,14 @@ const API = {
   TRAINING: `${API_BASE_URL}/api/training.php`,
   TRAINING_PROGRAMS: `${API_BASE_URL}/api/training.php?programs=1`,
   TRAINING_SESSIONS: `${API_BASE_URL}/api/training.php?sessions=1`,
-  TRAINING_SESSION: (id) =>
-    `${API_BASE_URL}/api/training.php?sessions=1&session_id=${id}`,
+  TRAINING_SESSION: (id) => `${API_BASE_URL}/api/training.php?sessions=1&session_id=${id}`,
   TRAINING_TRAINERS: `${API_BASE_URL}/api/training.php?trainers=1`,
-  TRAINING_MATERIALS: (sessionId) =>
-    `${API_BASE_URL}/api/training.php?materials=1&session_id=${sessionId}`,
+  TRAINING_MATERIALS: (sessionId) => `${API_BASE_URL}/api/training.php?materials=1&session_id=${sessionId}`,
   TRAINING_ENROLLMENTS: `${API_BASE_URL}/api/training.php?enrollments=1`,
-  TRAINING_HISTORY: (employeeId) =>
-    `${API_BASE_URL}/api/training.php?history=1&employee_id=${employeeId}`,
-  TRAINING_BUDGET: (programId, year) =>
-    `${API_BASE_URL}/api/training.php?budget=1&program_id=${programId}&year=${year || new Date().getFullYear()}`,
-  TRAINING_SKILL_GAP: (employeeId) =>
-    `${API_BASE_URL}/api/training.php?skill-gap=1&employee_id=${employeeId}`,
-  TRAINING_REPORT: (type, year) =>
-    `${API_BASE_URL}/api/training.php?report=1&type=${type}&year=${year || new Date().getFullYear()}`,
+  TRAINING_HISTORY: (employeeId) => `${API_BASE_URL}/api/training.php?history=1&employee_id=${employeeId}`,
+  TRAINING_BUDGET: (programId, year) => `${API_BASE_URL}/api/training.php?budget=1&program_id=${programId}&year=${year || new Date().getFullYear()}`,
+  TRAINING_SKILL_GAP: (employeeId) => `${API_BASE_URL}/api/training.php?skill-gap=1&employee_id=${employeeId}`,
+  TRAINING_REPORT: (type, year) => `${API_BASE_URL}/api/training.php?report=1&type=${type}&year=${year || new Date().getFullYear()}`,
   TRAINING_CREATE_PROGRAM: `${API_BASE_URL}/api/training.php`,
   TRAINING_CREATE_SESSION: `${API_BASE_URL}/api/training.php`,
   TRAINING_ENROLL: `${API_BASE_URL}/api/training.php`,
@@ -145,8 +141,7 @@ const API = {
   TRAINING_CREATE_SKILL_GAP: `${API_BASE_URL}/api/training.php`,
   TRAINING_UPDATE_PROGRAM: (id) => `${API_BASE_URL}/api/training.php?id=${id}`,
   TRAINING_UPDATE_SESSION: (id) => `${API_BASE_URL}/api/training.php?id=${id}`,
-  TRAINING_DELETE: (id, type) =>
-    `${API_BASE_URL}/api/training.php?id=${id}&type=${type}`,
+  TRAINING_DELETE: (id, type) => `${API_BASE_URL}/api/training.php?id=${id}&type=${type}`,
 
   // =========================================================
   //  📢 NOTIFICATIONS & ANNOUNCEMENTS
@@ -162,41 +157,30 @@ const API = {
   NOTIFICATION_PREFERENCES_UPDATE: `${API_BASE_URL}/api/notifications.php`,
   ANNOUNCEMENT_CREATE: `${API_BASE_URL}/api/notifications.php`,
   ANNOUNCEMENT_UPDATE: (id) => `${API_BASE_URL}/api/notifications.php?id=${id}`,
-  ANNOUNCEMENT_DELETE: (id) =>
-    `${API_BASE_URL}/api/notifications.php?id=${id}&type=announcement`,
-  NOTIFICATION_DELETE: (id) =>
-    `${API_BASE_URL}/api/notifications.php?id=${id}&type=notification`,
+  ANNOUNCEMENT_DELETE: (id) => `${API_BASE_URL}/api/notifications.php?id=${id}&type=announcement`,
+  NOTIFICATION_DELETE: (id) => `${API_BASE_URL}/api/notifications.php?id=${id}&type=notification`,
 
   // =========================================================
   //  📊 REPORTS & ANALYTICS
   // =========================================================
   REPORTS: `${API_BASE_URL}/api/reports.php`,
-  REPORTS_EMPLOYEE: (reportType) =>
-    `${API_BASE_URL}/api/reports.php?type=employee&report_type=${reportType}`,
-  REPORTS_ATTENDANCE: (period, month, year) =>
-    `${API_BASE_URL}/api/reports.php?type=attendance&period=${period}&month=${month}&year=${year}`,
-  REPORTS_LEAVE: (year) =>
-    `${API_BASE_URL}/api/reports.php?type=leave&year=${year}`,
-  REPORTS_PAYROLL: (month, year) =>
-    `${API_BASE_URL}/api/reports.php?type=payroll&month=${month}&year=${year}`,
-  REPORTS_PERFORMANCE: (year) =>
-    `${API_BASE_URL}/api/reports.php?type=performance&year=${year}`,
-  REPORTS_TRAINING: (year) =>
-    `${API_BASE_URL}/api/reports.php?type=training&year=${year}`,
-  REPORTS_RECRUITMENT: (year) =>
-    `${API_BASE_URL}/api/reports.php?type=recruitment&year=${year}`,
+  REPORTS_EMPLOYEE: (reportType) => `${API_BASE_URL}/api/reports.php?type=employee&report_type=${reportType}`,
+  REPORTS_ATTENDANCE: (period, month, year) => `${API_BASE_URL}/api/reports.php?type=attendance&period=${period}&month=${month}&year=${year}`,
+  REPORTS_LEAVE: (year) => `${API_BASE_URL}/api/reports.php?type=leave&year=${year}`,
+  REPORTS_PAYROLL: (month, year) => `${API_BASE_URL}/api/reports.php?type=payroll&month=${month}&year=${year}`,
+  REPORTS_PERFORMANCE: (year) => `${API_BASE_URL}/api/reports.php?type=performance&year=${year}`,
+  REPORTS_TRAINING: (year) => `${API_BASE_URL}/api/reports.php?type=training&year=${year}`,
+  REPORTS_RECRUITMENT: (year) => `${API_BASE_URL}/api/reports.php?type=recruitment&year=${year}`,
   REPORTS_DASHBOARD: `${API_BASE_URL}/api/reports.php?type=dashboard`,
   REPORTS_CUSTOM: `${API_BASE_URL}/api/reports.php?type=custom`,
-  REPORTS_EXPORT: (type, format, month, year) =>
-    `${API_BASE_URL}/api/reports.php?export=1&type=${type}&format=${format}&month=${month}&year=${year}`,
+  REPORTS_EXPORT: (type, format, month, year) => `${API_BASE_URL}/api/reports.php?export=1&type=${type}&format=${format}&month=${month}&year=${year}`,
 
   // =========================================================
-  //  🔧 SYSTEM SETTINGS (13.1 - 13.9)
+  //  🔧 SYSTEM SETTINGS
   // =========================================================
   SETTINGS: `${API_BASE_URL}/api/settings.php`,
   SETTINGS_COMPANY: `${API_BASE_URL}/api/settings.php?company=1`,
-  SETTINGS_GET: (group) =>
-    `${API_BASE_URL}/api/settings.php?settings=1&group=${group}`,
+  SETTINGS_GET: (group) => `${API_BASE_URL}/api/settings.php?settings=1&group=${group}`,
   SETTINGS_EMAIL: `${API_BASE_URL}/api/settings.php?email=1`,
   SETTINGS_ROLES: `${API_BASE_URL}/api/settings.php?roles=1`,
   SETTINGS_AUDIT: `${API_BASE_URL}/api/settings.php?audit=1`,
@@ -229,12 +213,12 @@ const APP_CONFIG = {
   appUrl: API_BASE_URL.replace("/backend", ""),
   env: API_BASE_URL.includes("localhost")
     ? "local"
-    : API_BASE_URL.includes("staging")
-      ? "staging"
-      : API_BASE_URL.includes("lgu2.com")
-        ? "production"
+    : API_BASE_URL.includes("infinityfree") || API_BASE_URL.includes("infy.click")
+      ? "production"
+      : API_BASE_URL.includes("staging")
+        ? "staging"
         : "unknown",
-  debug: true,
+  debug: false, // 👈 Set to false for production
   version: "1.0.0",
   defaults: {
     dateFormat: "YYYY-MM-DD",
