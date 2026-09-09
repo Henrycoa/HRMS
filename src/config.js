@@ -3,7 +3,7 @@
 //  🔧 CHANGE THIS ONE LINE TO SWITCH ENVIRONMENTS
 // =========================================================
 
-// For InfinityFree Production
+// For Vercel Production (with InfinityFree backend)
 const API_BASE_URL = "/backend";
 // const API_BASE_URL = "http://localhost/Lord%20help/backend";
 // const API_BASE_URL = "https://hrms1231.infy.click/backend";
@@ -217,8 +217,8 @@ const APP_CONFIG = {
       ? "production"
       : API_BASE_URL.includes("staging")
         ? "staging"
-        : "unknown",
-  debug: false, // 👈 Set to false for production
+        : "production",
+  debug: false,
   version: "1.0.0",
   defaults: {
     dateFormat: "YYYY-MM-DD",
