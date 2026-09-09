@@ -25,6 +25,15 @@ export const AuthProvider = ({ children }) => {
         if (token) {
             fetchUser();
         } else {
+            // Check if user exists in localStorage
+            const storedUser = localStorage.getItem('user');
+            if (storedUser) {
+                try {
+                    setUser(JSON.parse(storedUser));
+                } catch (e) {
+                    localStorage.removeItem('user');
+                }
+            }
             setLoading(false);
         }
     }, [token]);
@@ -32,14 +41,23 @@ export const AuthProvider = ({ children }) => {
     const fetchUser = async () => {
         try {
             const response = await authAPI.me();
+            console.log('🔍 Fetch user response:', response.data);
+            
             if (response.data.status === 1 && response.data.success) {
-                setUser(response.data.data.user);
+                const userData = response.data.data.user;
+                setUser(userData);
+                localStorage.setItem('user', JSON.stringify(userData));
             } else {
+                // If session expired, clear everything
                 logout();
             }
         } catch (error) {
-            console.error('Failed to fetch user:', error);
-            logout();
+            console.error('❌ Failed to fetch user:', error);
+            // Don't logout immediately - maybe it's a network error
+            // Only logout if we get a 401 response
+            if (error.response?.status === 401) {
+                logout();
+            }
         } finally {
             setLoading(false);
         }
@@ -50,7 +68,9 @@ export const AuthProvider = ({ children }) => {
     // ============================================
     const login = async (username, password, remember_me = false) => {
         try {
+            console.log('🔑 Login attempt:', username);
             const response = await authAPI.login(username, password, remember_me);
+            console.log('🔑 Login response:', response.data);
 
             if (response.data.requires_2fa) {
                 return { 
@@ -62,37 +82,50 @@ export const AuthProvider = ({ children }) => {
             if (response.data.status === 1 && response.data.success) {
                 const { token, data } = response.data;
                 
-                localStorage.setItem('token', token);
+                if (token) {
+                    localStorage.setItem('token', token);
+                }
                 localStorage.setItem('user', JSON.stringify(data.user));
                 
                 setToken(token);
                 setUser(data.user);
                 
-                toast.success(`Welcome back, ${data.user.first_name}!`);
+                toast.success(`Welcome back, ${data.user.first_name || 'User'}!`);
                 return { success: true, user: data.user };
             } else {
-                toast.error(response.data.message || 'Login failed');
-                return { success: false, message: response.data.message };
+                const msg = response.data.message || 'Login failed';
+                toast.error(msg);
+                return { success: false, message: msg };
             }
         } catch (error) {
-            const message = error.response?.data?.message || 'Login failed';
+            console.error('❌ Login error:', error);
+            let message = 'Login failed. Please try again.';
+            
+            if (error.response?.data?.message) {
+                message = error.response.data.message;
+            } else if (error.message) {
+                message = error.message;
+            }
+            
             toast.error(message);
             return { success: false, message };
         }
     };
 
     // ============================================
-    // ✅ 1.1 REGISTER SYSTEM - FIXED
+    // ✅ 1.1 REGISTER SYSTEM
     // ============================================
     const register = async (userData) => {
         try {
+            console.log('📝 Register attempt:', userData.email);
             const response = await authAPI.register(userData);
+            console.log('📝 Register response:', response.data);
             
             if (response.data.status === 1 && response.data.success) {
-                toast.success('Registration successful! Please login.');
+                toast.success(response.data.message || 'Registration successful! Please login.');
                 return { 
                     success: true, 
-                    user: response.data.data,
+                    data: response.data.data,
                     message: response.data.message 
                 };
             } else {
@@ -101,7 +134,8 @@ export const AuthProvider = ({ children }) => {
                 return { success: false, message };
             }
         } catch (error) {
-            const message = error.response?.data?.message || 'Registration failed';
+            console.error('❌ Register error:', error);
+            const message = error.response?.data?.message || 'Registration failed. Please try again.';
             toast.error(message);
             return { success: false, message };
         }
@@ -330,18 +364,19 @@ export const AuthProvider = ({ children }) => {
     };
 
     // ============================================
-    // ✅ AUTH VALUE OBJECT - REGISTER INCLUDED
+    // ✅ AUTH VALUE OBJECT
     // ============================================
     const value = {
         // State
         user,
+        setUser,
         loading,
         token,
         isAuthenticated: !!user,
 
-        // Login & Register - ✅ REGISTER IS HERE
+        // Login & Register
         login,
-        register,  // ✅ REGISTER FUNCTION - MAKE SURE THIS IS HERE
+        register,
         logout,
 
         // 2FA
@@ -383,3 +418,5 @@ export const AuthProvider = ({ children }) => {
         </AuthContext.Provider>
     );
 };
+
+export default AuthContext;
