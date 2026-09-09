@@ -38,7 +38,6 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    // Handle 401 Unauthorized
     if (error.response?.status === 401) {
       localStorage.removeItem("token");
       localStorage.removeItem("user");
@@ -52,17 +51,14 @@ api.interceptors.response.use(
       }
     }
     
-    // Handle 403 Forbidden
     if (error.response?.status === 403) {
       console.warn('⚠️ [API] Forbidden - Insufficient permissions');
     }
     
-    // Handle 500 Server Error
     if (error.response?.status >= 500) {
       console.error('❌ [API] Server Error:', error.response.data);
     }
     
-    // Handle Network Error
     if (error.code === 'ERR_NETWORK') {
       console.error('❌ [API] Network Error - Please check your connection');
     }
@@ -71,21 +67,15 @@ api.interceptors.response.use(
   }
 );
 
-// =========================================================
-//  EXPORT API INSTANCE
-// =========================================================
 export default api;
 
 // =========================================================
 //  API HELPERS
 // =========================================================
-
-// GET with params
 api.getWithParams = (url, params = {}) => {
   return api.get(url, { params });
 };
 
-// POST with FormData
 api.postFormData = (url, formData) => {
   return api.post(url, formData, {
     headers: {
@@ -94,7 +84,6 @@ api.postFormData = (url, formData) => {
   });
 };
 
-// PUT with FormData
 api.putFormData = (url, formData) => {
   return api.put(url, formData, {
     headers: {
