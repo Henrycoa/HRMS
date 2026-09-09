@@ -1,12 +1,13 @@
 // frontend/src/services/api.js
 import axios from "axios";
-import { API_BASE_URL } from "../config";
 
 // =========================================================
-//  CREATE AXIOS INSTANCE
+//  DYNAMIC BASE URL - Works for both local and production
 // =========================================================
+const API_URL = "/backend";
+
 const api = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL: API_URL,
   headers: {
     "Content-Type": "application/json",
     Accept: "application/json",
@@ -16,7 +17,7 @@ const api = axios.create({
 });
 
 // =========================================================
-//  REQUEST INTERCEPTOR
+//  REQUEST INTERCEPTOR - Add logging
 // =========================================================
 api.interceptors.request.use(
   (config) => {
@@ -24,6 +25,7 @@ api.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+    console.log('🚀 [API] Request:', config.method.toUpperCase(), config.url);
     return config;
   },
   (error) => {
@@ -33,64 +35,43 @@ api.interceptors.request.use(
 );
 
 // =========================================================
-//  RESPONSE INTERCEPTOR
+//  RESPONSE INTERCEPTOR - Better error handling
 // =========================================================
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    console.log('✅ [API] Response:', response.status, response.config.url);
+    return response;
+  },
   (error) => {
+    console.error('❌ [API] Response Error:', error);
+    
     if (error.response?.status === 401) {
       localStorage.removeItem("token");
       localStorage.removeItem("user");
-      localStorage.removeItem("employee_id");
-      
-      if (window.location.pathname !== "/login" && 
-          window.location.pathname !== "/register" &&
-          window.location.pathname !== "/forgot-password" &&
-          window.location.pathname !== "/reset-password") {
+      if (window.location.pathname !== "/login" && window.location.pathname !== "/register") {
         window.location.href = "/login";
       }
     }
     
-    if (error.response?.status === 403) {
-      console.warn('⚠️ [API] Forbidden - Insufficient permissions');
-    }
-    
-    if (error.response?.status >= 500) {
-      console.error('❌ [API] Server Error:', error.response.data);
-    }
-    
-    if (error.code === 'ERR_NETWORK') {
-      console.error('❌ [API] Network Error - Please check your connection');
+    // Log full error details
+    if (error.response) {
+      console.error('Response data:', error.response.data);
+      console.error('Response status:', error.response.status);
+      console.error('Response headers:', error.response.headers);
+    } else if (error.request) {
+      console.error('No response received:', error.request);
+    } else {
+      console.error('Request setup error:', error.message);
     }
     
     return Promise.reject(error);
   }
 );
 
+// =========================================================
+//  EXPORT
+// =========================================================
 export default api;
-
-// =========================================================
-//  API HELPERS
-// =========================================================
-api.getWithParams = (url, params = {}) => {
-  return api.get(url, { params });
-};
-
-api.postFormData = (url, formData) => {
-  return api.post(url, formData, {
-    headers: {
-      'Content-Type': 'multipart/form-data',
-    },
-  });
-};
-
-api.putFormData = (url, formData) => {
-  return api.put(url, formData, {
-    headers: {
-      'Content-Type': 'multipart/form-data',
-    },
-  });
-};
 
 // =========================================================
 //  AUTH API
